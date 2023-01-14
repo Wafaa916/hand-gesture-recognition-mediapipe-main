@@ -6,6 +6,7 @@ import argparse
 import itertools
 from collections import Counter
 from collections import deque
+import os 
 
 import cv2 as cv
 import numpy as np
@@ -52,10 +53,10 @@ def main():
 
     use_brect = True
 
-    # Camera preparation ###############################################################
-    cap = cv.VideoCapture(cap_device)
-    cap.set(cv.CAP_PROP_FRAME_WIDTH, cap_width)
-    cap.set(cv.CAP_PROP_FRAME_HEIGHT, cap_height)
+    # # Camera preparation ###############################################################
+    # cap = cv.VideoCapture(cap_device)
+    # cap.set(cv.CAP_PROP_FRAME_WIDTH, cap_width)
+    # cap.set(cv.CAP_PROP_FRAME_HEIGHT, cap_height)
 
     # Model load #############################################################
     mp_hands = mp.solutions.hands
@@ -97,8 +98,10 @@ def main():
 
     #  ########################################################################
     mode = 0
-
-    while True:
+    num_images=len(images_names)
+    curr_image=0
+    
+    while curr_image<num_images:
 
         # Process Key (ESC: end) #################################################
         key = cv.waitKey(10)
@@ -107,7 +110,7 @@ def main():
         number, mode = select_mode(key, mode)
         print("Try Open Image")
         # Camera capture #####################################################
-        image = cv.imread("F16_jpg.rf.46171e20f1d7705061ed245059d607b6.jpg")
+        image = cv.imread(images_path+images_names[curr_image])
         print("Image opened")
         image = cv.flip(image, 1)  # Mirror display
         debug_image = copy.deepcopy(image)
@@ -174,6 +177,7 @@ def main():
 
         # Screen reflection #############################################################
         cv.imshow('Hand Gesture Recognition', debug_image)
+        curr_image+=1
     cv.destroyAllWindows()
 
 
@@ -536,4 +540,12 @@ def draw_info(image, fps, mode, number):
 
 
 if __name__ == '__main__':
+    images_path="C:/Users/mohamed alameen/Desktop/AslDec/New folder/train/images/A/"
+    images_names= os.listdir(images_path)
+    
+    # for dirname, _, filenames in os.walk(images_path):
+    #     for filename in filenames:
+    #         print(os.path.join(dirname, filename))
+    #         pathname = os.path.join(dirname, filename)
+
     main()
