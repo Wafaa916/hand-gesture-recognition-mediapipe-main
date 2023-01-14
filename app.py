@@ -107,7 +107,8 @@ def main():
         key = cv.waitKey(10)
         if key == 27:  # ESC
             break
-        number, mode = select_mode(key, mode)
+        # number, mode = select_mode(key, mode)
+        number=alphabets.index(images_names[curr_image][0])
         print("Try Open Image")
         # Camera capture #####################################################
         image = cv.imread(images_path+images_names[curr_image])
@@ -137,7 +138,7 @@ def main():
                 pre_processed_point_history_list = pre_process_point_history(
                     debug_image, point_history)
                 # Write to the dataset file
-                logging_csv(8, 1, pre_processed_landmark_list,
+                logging_csv(number, 1, pre_processed_landmark_list,
                             pre_processed_point_history_list)
 
                 # Hand sign classification
@@ -540,9 +541,9 @@ def draw_info(image, fps, mode, number):
 
 
 if __name__ == '__main__':
-    images_path="C:/Users/mohamed alameen/Desktop/AslDec/New folder/train/images/A/"
+    images_path="C:/Users/mohamed alameen/Desktop/AslDec/New folder/train/images/"
     images_names= os.listdir(images_path)
-    
+    alphabets = list("ABCDEFGHIJKLMNOPQRSTUVWXYZ")
     # for dirname, _, filenames in os.walk(images_path):
     #     for filename in filenames:
     #         print(os.path.join(dirname, filename))
