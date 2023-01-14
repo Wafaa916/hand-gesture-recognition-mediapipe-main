@@ -15,7 +15,7 @@ from utils import CvFpsCalc
 from model import KeyPointClassifier
 from model import PointHistoryClassifier
 
-
+#this is my comment
 def get_args():
     parser = argparse.ArgumentParser()
 
