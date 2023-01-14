@@ -541,7 +541,7 @@ def draw_info(image, fps, mode, number):
 
 
 if __name__ == '__main__':
-    images_path="C:/Users/mohamed alameen/Desktop/AslDec/New folder/train/images/"
+    images_path="C:/Users/mohamed alameen/Desktop/ASL project/SL project/asl_alphabet_train/asl_alphabet_train/E/"
     images_names= os.listdir(images_path)
     alphabets = list("ABCDEFGHIJKLMNOPQRSTUVWXYZ")
     # for dirname, _, filenames in os.walk(images_path):
