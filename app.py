@@ -99,18 +99,16 @@ def main():
     mode = 0
 
     while True:
-        fps = cvFpsCalc.get()
 
         # Process Key (ESC: end) #################################################
         key = cv.waitKey(10)
         if key == 27:  # ESC
             break
         number, mode = select_mode(key, mode)
-
+        print("Try Open Image")
         # Camera capture #####################################################
-        ret, image = cap.read()
-        if not ret:
-            break
+        image = cv2.imread("C:/Users/osyue/Pictures/L.jpg")
+        print("Image opened")
         image = cv.flip(image, 1)  # Mirror display
         debug_image = copy.deepcopy(image)
 
@@ -136,7 +134,7 @@ def main():
                 pre_processed_point_history_list = pre_process_point_history(
                     debug_image, point_history)
                 # Write to the dataset file
-                logging_csv(number, mode, pre_processed_landmark_list,
+                logging_csv(8, 1, pre_processed_landmark_list,
                             pre_processed_point_history_list)
 
                 # Hand sign classification
@@ -176,8 +174,6 @@ def main():
 
         # Screen reflection #############################################################
         cv.imshow('Hand Gesture Recognition', debug_image)
-
-    cap.release()
     cv.destroyAllWindows()
 
 
