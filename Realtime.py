@@ -6,7 +6,6 @@ import argparse
 import itertools
 from collections import Counter
 from collections import deque
-import os 
 
 import cv2 as cv
 import numpy as np
@@ -16,7 +15,7 @@ from utils import CvFpsCalc
 from model import KeyPointClassifier
 from model import PointHistoryClassifier
 
-#this is my comment
+
 def get_args():
     parser = argparse.ArgumentParser()
 
@@ -53,10 +52,10 @@ def main():
 
     use_brect = True
 
-    # # Camera preparation ###############################################################
-    # cap = cv.VideoCapture(cap_device)
-    # cap.set(cv.CAP_PROP_FRAME_WIDTH, cap_width)
-    # cap.set(cv.CAP_PROP_FRAME_HEIGHT, cap_height)
+    # Camera preparation ###############################################################
+    cap = cv.VideoCapture(cap_device)
+    cap.set(cv.CAP_PROP_FRAME_WIDTH, cap_width)
+    cap.set(cv.CAP_PROP_FRAME_HEIGHT, cap_height)
 
     # Model load #############################################################
     mp_hands = mp.solutions.hands
@@ -98,21 +97,20 @@ def main():
 
     #  ########################################################################
     mode = 0
-    num_images=len(images_names)
-    curr_image=0
-    
-    while curr_image<num_images:
+
+    while True:
+        fps = cvFpsCalc.get()
 
         # Process Key (ESC: end) #################################################
         key = cv.waitKey(10)
         if key == 27:  # ESC
             break
-        # number, mode = select_mode(key, mode)
-        number=alphabets.index(images_names[curr_image][0])
-        print("Try Open Image")
+        number, mode = select_mode(key, mode)
+
         # Camera capture #####################################################
-        image = cv.imread(images_path+images_names[curr_image])
-        print("Image opened")
+        ret, image = cap.read()
+        if not ret:
+            break
         image = cv.flip(image, 1)  # Mirror display
         debug_image = copy.deepcopy(image)
 
@@ -138,7 +136,7 @@ def main():
                 pre_processed_point_history_list = pre_process_point_history(
                     debug_image, point_history)
                 # Write to the dataset file
-                logging_csv(number, 1, pre_processed_landmark_list,
+                logging_csv(number, mode, pre_processed_landmark_list,
                             pre_processed_point_history_list)
 
                 # Hand sign classification
@@ -174,25 +172,26 @@ def main():
             point_history.append([0, 0])
 
         debug_image = draw_point_history(debug_image, point_history)
-        debug_image = draw_info(debug_image, 60, mode, number)
+        debug_image = draw_info(debug_image, fps, mode, number)
 
         # Screen reflection #############################################################
         cv.imshow('Hand Gesture Recognition', debug_image)
-        curr_image+=1
+
+    cap.release()
     cv.destroyAllWindows()
 
 
-# def select_mode(key, mode):
-#     number = -1
-#     if 48 <= key <= 57:  # 0 ~ 9
-#         number = key - 48
-#     if key == 110:  # n
-#         mode = 0
-#     if key == 107:  # k
-#         mode = 1
-#     if key == 104:  # h
-#         mode = 2
-#     return number, mode
+def select_mode(key, mode):
+    number = -1
+    if 48 <= key <= 57:  # 0 ~ 9
+        number = key - 48
+    if key == 110:  # n
+        mode = 0
+    if key == 107:  # k
+        mode = 1
+    if key == 104:  # h
+        mode = 2
+    return number, mode
 
 
 def calc_bounding_rect(image, landmarks):
@@ -282,12 +281,12 @@ def pre_process_point_history(image, point_history):
 def logging_csv(number, mode, landmark_list, point_history_list):
     if mode == 0:
         pass
-    if mode == 1 and (0 <= number <= 25):
+    if mode == 1 and (0 <= number <= 9):
         csv_path = 'model/keypoint_classifier/keypoint.csv'
         with open(csv_path, 'a', newline="") as f:
             writer = csv.writer(f)
             writer.writerow([number, *landmark_list])
-    if mode == 2 and (0 <= number <= 25):
+    if mode == 2 and (0 <= number <= 9):
         csv_path = 'model/point_history_classifier/point_history.csv'
         with open(csv_path, 'a', newline="") as f:
             writer = csv.writer(f)
@@ -541,12 +540,4 @@ def draw_info(image, fps, mode, number):
 
 
 if __name__ == '__main__':
-    images_path="C:/Users/mohamed alameen/Desktop/AslDec/New folder/train/images/"
-    images_names= os.listdir(images_path)
-    alphabets = list("ABCDEFGHIJKLMNOPQRSTUVWXYZ")
-    # for dirname, _, filenames in os.walk(images_path):
-    #     for filename in filenames:
-    #         print(os.path.join(dirname, filename))
-    #         pathname = os.path.join(dirname, filename)
-
     main()
