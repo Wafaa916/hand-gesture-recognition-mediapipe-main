@@ -107,7 +107,7 @@ def main():
         number, mode = select_mode(key, mode)
         print("Try Open Image")
         # Camera capture #####################################################
-        image = cv2.imread("C:/Users/osyue/Pictures/L.jpg")
+        image = cv.imread("F16_jpg.rf.46171e20f1d7705061ed245059d607b6.jpg")
         print("Image opened")
         image = cv.flip(image, 1)  # Mirror display
         debug_image = copy.deepcopy(image)
@@ -170,7 +170,7 @@ def main():
             point_history.append([0, 0])
 
         debug_image = draw_point_history(debug_image, point_history)
-        debug_image = draw_info(debug_image, fps, mode, number)
+        debug_image = draw_info(debug_image, 60, mode, number)
 
         # Screen reflection #############################################################
         cv.imshow('Hand Gesture Recognition', debug_image)
