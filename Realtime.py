@@ -14,8 +14,10 @@ import mediapipe as mp
 from utils import CvFpsCalc
 from model import KeyPointClassifier
 from model import PointHistoryClassifier
-
-
+import gtts 
+import pyttsx3
+import os
+from gtts import gTTS
 def get_args():
     parser = argparse.ArgumentParser()
 
@@ -37,6 +39,11 @@ def get_args():
 
     return args
 
+# def speak_text(text):
+#     tts = gTTS(text=text, lang='en')
+#     tts.save("temp.mp3")
+#     os.system("mpg321 temp.mp3")
+#     os.remove("temp.mp3")
 
 def main():
     # Argument parsing #################################################################
@@ -76,6 +83,7 @@ def main():
         keypoint_classifier_labels = csv.reader(f)
         keypoint_classifier_labels = [
             row[0] for row in keypoint_classifier_labels
+            
         ]
     with open(
             'model/point_history_classifier/point_history_classifier_label.csv',
@@ -84,7 +92,7 @@ def main():
         point_history_classifier_labels = [
             row[0] for row in point_history_classifier_labels
         ]
-
+    #keypoint_classifier_labels.append("#")
     # FPS Measurement ########################################################
     cvFpsCalc = CvFpsCalc(buffer_len=10)
 
@@ -157,7 +165,8 @@ def main():
                 finger_gesture_history.append(finger_gesture_id)
                 most_common_fg_id = Counter(
                     finger_gesture_history).most_common()
-
+                print(hand_sign_id)
+                #speak_text(hand_sign_id)
                 # Drawing part
                 debug_image = draw_bounding_rect(use_brect, debug_image, brect)
                 debug_image = draw_landmarks(debug_image, landmark_list)
@@ -170,7 +179,7 @@ def main():
                 )
         else:
             point_history.append([0, 0])
-
+            print("no detection")
         debug_image = draw_point_history(debug_image, point_history)
         debug_image = draw_info(debug_image, fps, mode, number)
 
@@ -497,8 +506,12 @@ def draw_info_text(image, brect, handedness, hand_sign_text,
                  (0, 0, 0), -1)
 
     info_text = handedness.classification[0].label[0:]
+    #print(info_text)
+    info_text = info_text + ':' 
     if hand_sign_text != "":
-        info_text = info_text + ':' + hand_sign_text
+        info_text+= hand_sign_text
+    else:
+        info_text="not recognized "
     cv.putText(image, info_text, (brect[0] + 5, brect[1] - 4),
                cv.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 1, cv.LINE_AA)
 
@@ -520,7 +533,7 @@ def draw_point_history(image, point_history):
 
     return image
 
-
+#go back to it 
 def draw_info(image, fps, mode, number):
     cv.putText(image, "FPS:" + str(fps), (10, 30), cv.FONT_HERSHEY_SIMPLEX,
                1.0, (0, 0, 0), 4, cv.LINE_AA)
@@ -532,7 +545,7 @@ def draw_info(image, fps, mode, number):
         cv.putText(image, "MODE:" + mode_string[mode - 1], (10, 90),
                    cv.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 1,
                    cv.LINE_AA)
-        if 0 <= number <= 9:
+        if 0 <= number <= 25:
             cv.putText(image, "NUM:" + str(number), (10, 110),
                        cv.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 1,
                        cv.LINE_AA)
